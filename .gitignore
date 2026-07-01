@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Compiled extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.env
+
+# Azure credentials (if any)
+.azure/
+*.pem
+*.key
+
+# Data Files
+*.csv
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+
+# Generated Outputs
+outputs/
+results/
+reports/
+plots/
+figures/
+charts/
+
+# Generated models
+models/
+*.pkl
+*.pickle
+*.joblib
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+
+dataset/
