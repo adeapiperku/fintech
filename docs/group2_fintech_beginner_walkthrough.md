@@ -145,7 +145,7 @@ print("Closeness (1.0 = perfect):", round(df["my_loss"].corr(df["estimated_fraud
 
 ✅ **You beat Step 5 when:** the closeness is **above 0.9**.
 
-**Save your cleaned data for the agent:**
+**Save your cleaned data for the agent: /////**
 ```python
 df.to_csv("fintech_cleaned.csv", index=False)
 ```
