@@ -1,0 +1,1 @@
+Model takes text, finds keywords, arranges them appropriately, uses tool calling ML model to predict whether its fraud.
