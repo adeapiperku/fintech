@@ -1,0 +1,14 @@
+Financial Records Report
+
+Transaction summary:
+- transaction_amount: 42.90
+- average_transaction_amount: 185.30
+- ip_risk_score: 9.8
+- customer_age: 38
+- previous_failed_logins: 0
+- transaction_frequency_24h: 1
+- location_mismatch: 0
+- device_mismatch: 0
+
+Context:
+This is a routine grocery payment from the customer's usual home city and known mobile device. Login history is clean and transaction behavior is consistent with past spending patterns.

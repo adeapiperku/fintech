@@ -1,0 +1,14 @@
+Financial Records Report
+
+Transaction summary:
+- transaction_amount: 1450.75
+- average_transaction_amount: 180.20
+- ip_risk_score: 88.3
+- customer_age: 41
+- previous_failed_logins: 3
+- transaction_frequency_24h: 11
+- location_mismatch: 1
+- device_mismatch: 1
+
+Context:
+Customer usually transacts from Germany, but this transaction originated from a new location and unknown device. Multiple failed login attempts were recorded before payment authorization.
