@@ -11,7 +11,7 @@ from typing import Any, Dict, Tuple
 import pandas as pd
 from langchain.agents import create_agent
 from langchain_core.tools import tool
-from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic import BaseModel, Field
 from sklearn.ensemble import RandomForestClassifier
 
@@ -47,6 +47,27 @@ class ModelBundle:
 def normalize_base_url(base_url: str) -> str:
     base = base_url.rstrip("/")
     return f"{base}/v1" if not base.endswith("/v1") else base
+
+
+def build_llm_from_args(args: argparse.Namespace) -> Any:
+    if args.llm_provider == "openai_compatible":
+        return ChatOpenAI(
+            model=args.model,
+            base_url=normalize_base_url(args.base_url),
+            api_key=args.api_key,
+            temperature=0,
+        )
+
+    if args.llm_provider == "azure_foundry":
+        return AzureChatOpenAI(
+            azure_endpoint=args.azure_endpoint,
+            azure_deployment=args.azure_deployment,
+            api_version=args.azure_api_version,
+            api_key=args.azure_api_key,
+            temperature=0,
+        )
+
+    raise ValueError(f"Unsupported llm_provider: {args.llm_provider}")
 
 
 def load_training_data(csv_path: Path) -> Tuple[pd.DataFrame, pd.Series, Dict[str, float]]:
@@ -156,6 +177,12 @@ def read_report_text(report_path: Path) -> str:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="LangChain fintech fraud detection agent")
     parser.add_argument(
+        "--llm-provider",
+        choices=["openai_compatible", "azure_foundry"],
+        default="openai_compatible",
+        help="LLM backend mode: openai_compatible or azure_foundry",
+    )
+    parser.add_argument(
         "--report",
         required=True,
         help="Path to a text/markdown report describing the financial record(s)",
@@ -168,20 +195,53 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--base-url",
         default="http://127.0.0.1:1234",
-        help="Local OpenAI-compatible endpoint (default: http://127.0.0.1:1234)",
+        help="OpenAI-compatible endpoint base URL (used when --llm-provider=openai_compatible)",
     )
     parser.add_argument(
         "--model",
         default="local-model",
-        help="Model name exposed by your local endpoint",
+        help="Model name for OpenAI-compatible endpoint (used when --llm-provider=openai_compatible)",
     )
     parser.add_argument(
         "--api-key",
         default="lm-studio",
-        help="API key value for the local endpoint (placeholder is fine for most local servers)",
+        help="API key for OpenAI-compatible endpoint (used when --llm-provider=openai_compatible)",
+    )
+    parser.add_argument(
+        "--azure-endpoint",
+        default="",
+        help="Azure AI Foundry endpoint (used when --llm-provider=azure_foundry)",
+    )
+    parser.add_argument(
+        "--azure-deployment",
+        default="",
+        help="Azure AI Foundry deployment name (used when --llm-provider=azure_foundry)",
+    )
+    parser.add_argument(
+        "--azure-api-version",
+        default="2024-10-21",
+        help="Azure OpenAI API version (used when --llm-provider=azure_foundry)",
+    )
+    parser.add_argument(
+        "--azure-api-key",
+        default="",
+        help="API key for Azure AI Foundry (used when --llm-provider=azure_foundry)",
     )
     parser.add_argument("--random-state", type=int, default=42)
-    return parser.parse_args()
+
+    args = parser.parse_args()
+    if args.llm_provider == "azure_foundry":
+        missing = []
+        if not args.azure_endpoint:
+            missing.append("--azure-endpoint")
+        if not args.azure_deployment:
+            missing.append("--azure-deployment")
+        if not args.azure_api_key:
+            missing.append("--azure-api-key")
+        if missing:
+            parser.error(f"Missing required Azure settings for azure_foundry mode: {', '.join(missing)}")
+
+    return args
 
 
 def main() -> None:
@@ -192,12 +252,7 @@ def main() -> None:
 
     model_bundle = train_random_forest(dataset_path, random_state=args.random_state)
 
-    llm = ChatOpenAI(
-        model=args.model,
-        base_url=normalize_base_url(args.base_url),
-        api_key=args.api_key,
-        temperature=0,
-    )
+    llm = build_llm_from_args(args)
 
     agent_executor = build_agent(model_bundle, llm)
     report_text = read_report_text(report_path)
