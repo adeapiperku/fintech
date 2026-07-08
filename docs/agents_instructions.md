@@ -117,3 +117,8 @@ This project follows a multi-agent fraud detection architecture:
 - Loss Estimator → financial impact analysis
 - Fraud Investigation → routing layer
 - Decision Agent → final decision engine
+
+<!-- questions for chat -->
+Is transaction 10452 fraudulent?
+
+Is transaction TX00000001 fraudulent?
